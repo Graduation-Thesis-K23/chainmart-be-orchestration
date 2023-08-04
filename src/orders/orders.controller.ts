@@ -31,7 +31,11 @@ export class OrdersController implements OnModuleInit {
         .pipe(timeout(60000));
       const batchResponse = await lastValueFrom($batchResponse);
       if (batchResponse === 'Packaged') {
-        this.orderClient.emit('orders.packaged', order.id);
+        // this.orderClient.emit('orders.packaged', order.id);
+        this.orderClient.emit('orders.approveorderbyemployee', {
+          phone: 'BOT',
+          order_id: order.id,
+        });
       }
     } catch (error) {
       console.error(error);

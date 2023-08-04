@@ -25,16 +25,25 @@ export class OrdersController implements OnModuleInit {
 
   @EventPattern('orchestration.orders.created')
   async processOrder(order: any) {
+    console.log('orchestration.orders.created', order);
     try {
+      if (order.payment === 'CASH') {
+        return;
+      }
       const $batchResponse = this.batchClient
         .send('batches.package', order.order_details)
         .pipe(timeout(60000));
       const batchResponse = await lastValueFrom($batchResponse);
-      if (batchResponse === 'Packaged') {
+      // batches.order_status === 'Approved'
+      // batches.branch_id === branch should be same as order.branch_id
+      console.log('batchResponse', batchResponse);
+
+      if (batchResponse.order_status === 'Approved') {
         // this.orderClient.emit('orders.packaged', order.id);
         this.orderClient.emit('orders.approveorderbyemployee', {
           phone: 'BOT',
           order_id: order.id,
+          branch_id: batchResponse.branch_id,
         });
       }
     } catch (error) {

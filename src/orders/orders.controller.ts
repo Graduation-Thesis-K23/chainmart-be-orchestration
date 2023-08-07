@@ -16,7 +16,7 @@ export class OrdersController implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
-    const topics = ['package'];
+    const topics = ['package', 'checkavailable'];
     topics.forEach((topic) => {
       this.batchClient.subscribeToResponseOf(`batches.${topic}`);
     });
@@ -28,6 +28,11 @@ export class OrdersController implements OnModuleInit {
     console.log('orchestration.orders.created', order);
     try {
       if (order.payment === 'CASH') {
+        const $batchResponse = this.batchClient
+          .send('batches.checkavailable', order.order_details)
+          .pipe(timeout(60000));
+        const result = await lastValueFrom($batchResponse);
+        console.log('result', result);
         return;
       }
       const $batchResponse = this.batchClient

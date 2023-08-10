@@ -23,13 +23,10 @@ export class OrdersController implements OnModuleInit {
     await this.batchClient.connect();
   }
 
-  @EventPattern('orchestration.orders.created')
+  @EventPattern('orchestration.orders.paid')
   async processOrder(order: any) {
-    console.log('orchestration.orders.created', order);
+    console.log('orchestration.orders.paid', order);
     try {
-      if (order.payment === 'CASH') {
-        return;
-      }
       const $batchResponse = this.batchClient
         .send('batches.package', order.order_details)
         .pipe(timeout(60000));

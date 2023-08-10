@@ -16,11 +16,20 @@ export class OrdersController implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
-    const topics = ['package'];
+    const topics = ['package', 'checkavailable'];
     topics.forEach((topic) => {
       this.batchClient.subscribeToResponseOf(`batches.${topic}`);
     });
     await this.batchClient.connect();
+  }
+
+  @EventPattern('orchestration.orders.created')
+  async checkBatchesAvailable(order: any) {
+    const $batchResponse = this.batchClient
+      .send('batches.checkavailable', order.order_details)
+      .pipe(timeout(60000));
+    const result = await lastValueFrom($batchResponse);
+    console.log('result', result);
   }
 
   @EventPattern('orchestration.orders.paid')
@@ -46,6 +55,32 @@ export class OrdersController implements OnModuleInit {
     } catch (error) {
       console.error(error);
       this.orderClient.emit('orders.cancelled', order.id);
+    }
+  }
+
+  @EventPattern('orchestration.orders.approved_by_employee')
+  async approvedByEmployee(order: any) {
+    /* 
+    {
+      order_id: order.id,
+      order_details: order.order_details.map((order_detail) => ({
+        product_id: order_detail.product_id,
+        quantity: order_detail.quantity,
+      })),
+      branch_id: order.branch_id,
+    }
+    */
+    console.log('orchestration.orders.approved_by_employee', order);
+    try {
+      this.batchClient
+        .emit('batches.approved_by_employee', {
+          order_id: order.id,
+          order_details: order.order_details,
+          branch_id: order.branch_id,
+        })
+        .pipe(timeout(60000));
+    } catch (error) {
+      console.error(error);
     }
   }
 }

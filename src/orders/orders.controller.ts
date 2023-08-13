@@ -13,6 +13,9 @@ export class OrdersController implements OnModuleInit {
 
     @Inject('ORDER_SERVICE')
     private readonly orderClient: ClientKafka,
+
+    @Inject('NOTIFICATION_SERVICE')
+    private readonly notificationClient: ClientKafka,
   ) {}
 
   async onModuleInit() {
@@ -51,10 +54,14 @@ export class OrdersController implements OnModuleInit {
           order_id: order.id,
           branch_id: batchResponse.branch_id,
         });
+        this.notificationClient.emit('notification.orderapproved', order);
+      } else {
+        throw new Error(`Failed to approved order id(${order.id})`);
       }
     } catch (error) {
       console.error(error);
       this.orderClient.emit('orders.cancelled', order.id);
+      this.notificationClient.emit('notification.ordercancelled', order);
     }
   }
 

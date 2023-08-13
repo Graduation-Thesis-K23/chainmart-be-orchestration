@@ -7,9 +7,9 @@ import { OrdersController } from './orders.controller';
   imports: [
     ClientsModule.registerAsync([
       {
+        name: 'BATCH_SERVICE',
         imports: [ConfigModule],
         inject: [ConfigService],
-        name: 'BATCH_SERVICE',
         useFactory: async (configService: ConfigService) => ({
           transport: Transport.KAFKA,
           options: {
@@ -28,9 +28,9 @@ import { OrdersController } from './orders.controller';
         }),
       },
       {
+        name: 'ORDER_SERVICE',
         imports: [ConfigModule],
         inject: [ConfigService],
-        name: 'ORDER_SERVICE',
         useFactory: async (configService: ConfigService) => ({
           transport: Transport.KAFKA,
           options: {
@@ -47,6 +47,29 @@ import { OrdersController } from './orders.controller';
             },
           },
         }),
+      },
+      {
+        name: 'NOTIFICATION_SERVICE',
+        imports: [ConfigModule],
+        inject: [ConfigService],
+        useFactory: async (configService) => {
+          return {
+            transport: Transport.KAFKA,
+            options: {
+              client: {
+                clientId: 'notification-orchestration',
+                brokers: [
+                  `${configService.get('KAFKA_HOST')}:${configService.get(
+                    'KAFKA_PORT',
+                  )}`,
+                ],
+              },
+              consumer: {
+                groupId: 'notification-consumer-orchestration',
+              },
+            },
+          };
+        },
       },
     ]),
   ],

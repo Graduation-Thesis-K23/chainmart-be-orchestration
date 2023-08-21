@@ -1,5 +1,9 @@
 import { Controller, Inject, OnModuleInit, UseFilters } from '@nestjs/common';
-import { ClientKafka, EventPattern } from '@nestjs/microservices';
+import {
+  ClientKafka,
+  EventPattern,
+  MessagePattern,
+} from '@nestjs/microservices';
 import { lastValueFrom, timeout } from 'rxjs';
 
 import { ExceptionFilter } from 'src/filters/rpc-exception.filter';
@@ -24,6 +28,12 @@ export class OrdersController implements OnModuleInit {
       this.batchClient.subscribeToResponseOf(`batches.${topic}`);
     });
     await this.batchClient.connect();
+  }
+
+  @MessagePattern('orchestration.health-check')
+  async healthCheck() {
+    console.log('orchestration.health-check received');
+    return 'orchestration service is working';
   }
 
   @EventPattern('orchestration.orders.created')

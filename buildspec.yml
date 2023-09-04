@@ -3,11 +3,11 @@ version: 0.2
 phases:
   pre_build:
     commands:
-    - aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 429660533268.dkr.ecr.ap-southeast-1.amazonaws.com
+    - aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 701428285404.dkr.ecr.ap-southeast-1.amazonaws.com
   build:
     commands:
     - docker build -t chainmart-be-orchestration .
-    - docker tag chainmart-be-orchestration:latest 429660533268.dkr.ecr.ap-southeast-1.amazonaws.com/chainmart-be-orchestration:latest
+    - docker tag chainmart-be-orchestration:latest 701428285404.dkr.ecr.ap-southeast-1.amazonaws.com/chainmart-be-orchestration:latest
   post_build:
     commands:
-    - docker push 429660533268.dkr.ecr.ap-southeast-1.amazonaws.com/chainmart-be-orchestration:latest
+    - docker push 701428285404.dkr.ecr.ap-southeast-1.amazonaws.com/chainmart-be-orchestration:latest

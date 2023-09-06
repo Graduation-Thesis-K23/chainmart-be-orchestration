@@ -15,11 +15,7 @@ import { OrdersController } from './orders.controller';
           options: {
             client: {
               clientId: 'batch-orchestration',
-              brokers: [
-                `${configService.get('KAFKA_HOST')}:${configService.get(
-                  'KAFKA_PORT',
-                )}`,
-              ],
+              brokers: configService.get('KAFKA_BROKERS').split(','),
             },
             consumer: {
               groupId: 'batch-consumer-orchestration',
@@ -36,11 +32,7 @@ import { OrdersController } from './orders.controller';
           options: {
             client: {
               clientId: 'order-orchestration',
-              brokers: [
-                `${configService.get('KAFKA_HOST')}:${configService.get(
-                  'KAFKA_PORT',
-                )}`,
-              ],
+              brokers: configService.get('KAFKA_BROKERS').split(','),
             },
             consumer: {
               groupId: 'order-consumer-orchestration',
@@ -58,11 +50,7 @@ import { OrdersController } from './orders.controller';
             options: {
               client: {
                 clientId: 'notification-orchestration',
-                brokers: [
-                  `${configService.get('KAFKA_HOST')}:${configService.get(
-                    'KAFKA_PORT',
-                  )}`,
-                ],
+                brokers: configService.get('KAFKA_BROKERS').split(','),
               },
               consumer: {
                 groupId: 'notification-consumer-orchestration',
